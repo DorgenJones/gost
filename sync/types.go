@@ -66,6 +66,6 @@ func WithTaskPoolTaskQueueNumber(number int) TaskPoolOption {
 type IShardingTaskPool interface {
 	AddTask(t task)
 	AddShardTask(index int, t task)
-	IsClosed()
+	IsClosed()  bool
 	Close()
 }
