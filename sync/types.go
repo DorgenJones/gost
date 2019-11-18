@@ -9,7 +9,7 @@ package gxsync
 
 import "fmt"
 
-type task func()
+type Task func()
 
 
 /////////////////////////////////////////
@@ -17,9 +17,9 @@ type task func()
 /////////////////////////////////////////
 
 type TaskPoolOptions struct {
-	tQLen      int // task queue length
-	tQNumber   int // task queue number
-	tQPoolSize int // task pool size
+	tQLen      int // Task queue length
+	tQNumber   int // Task queue number
+	tQPoolSize int // Task pool size
 }
 
 func (o *TaskPoolOptions) validate() {
@@ -42,21 +42,21 @@ func (o *TaskPoolOptions) validate() {
 
 type TaskPoolOption func(*TaskPoolOptions)
 
-// @size is the task queue pool size
+// @size is the Task queue pool size
 func WithTaskPoolTaskPoolSize(size int) TaskPoolOption {
 	return func(o *TaskPoolOptions) {
 		o.tQPoolSize = size
 	}
 }
 
-// @length is the task queue length
+// @length is the Task queue length
 func WithTaskPoolTaskQueueLength(length int) TaskPoolOption {
 	return func(o *TaskPoolOptions) {
 		o.tQLen = length
 	}
 }
 
-// @number is the task queue number
+// @number is the Task queue number
 func WithTaskPoolTaskQueueNumber(number int) TaskPoolOption {
 	return func(o *TaskPoolOptions) {
 		o.tQNumber = number
@@ -64,8 +64,8 @@ func WithTaskPoolTaskQueueNumber(number int) TaskPoolOption {
 }
 
 type IShardingTaskPool interface {
-	AddTask(t task)
-	AddShardTask(index int, t task)
+	AddTask(t Task)
+	AddShardTask(index int, t Task)
 	IsClosed()  bool
 	Close()
 }

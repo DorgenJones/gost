@@ -32,19 +32,19 @@ const (
 // Task Pool
 /////////////////////////////////////////
 
-// task pool: manage task ts
+// Task pool: manage Task ts
 type TaskPool struct {
 	TaskPoolOptions
 
 	idx    uint32 // round robin index
-	qArray []chan task
+	qArray []chan Task
 	wg     sync.WaitGroup
 
 	once sync.Once
 	done chan struct{}
 }
 
-// build a task pool
+// build a Task pool
 func NewTaskPool(opts ...TaskPoolOption) *TaskPool {
 	var tOpts TaskPoolOptions
 	for _, opt := range opts {
@@ -55,19 +55,19 @@ func NewTaskPool(opts ...TaskPoolOption) *TaskPool {
 
 	p := &TaskPool{
 		TaskPoolOptions: tOpts,
-		qArray:          make([]chan task, tOpts.tQNumber),
+		qArray:          make([]chan Task, tOpts.tQNumber),
 		done:            make(chan struct{}),
 	}
 
 	for i := 0; i < p.tQNumber; i++ {
-		p.qArray[i] = make(chan task, p.tQLen)
+		p.qArray[i] = make(chan Task, p.tQLen)
 	}
 	p.start()
 
 	return p
 }
 
-// start task pool
+// start Task pool
 func (p *TaskPool) start() {
 	for i := 0; i < p.tQPoolSize; i++ {
 		p.wg.Add(1)
@@ -78,19 +78,19 @@ func (p *TaskPool) start() {
 }
 
 // worker
-func (p *TaskPool) run(id int, q chan task) error {
+func (p *TaskPool) run(id int, q chan Task) error {
 	defer p.wg.Done()
 
 	var (
 		ok bool
-		t  task
+		t  Task
 	)
 
 	for {
 		select {
 		case <-p.done:
 			if 0 < len(q) {
-				return fmt.Errorf("task worker %d exit now while its task buffer length %d is greater than 0",
+				return fmt.Errorf("Task worker %d exit now while its Task buffer length %d is greater than 0",
 					id, len(q))
 			}
 
@@ -104,14 +104,14 @@ func (p *TaskPool) run(id int, q chan task) error {
 	}
 }
 
-// add task
-func (p *TaskPool) AddTask(t task) {
+// add Task
+func (p *TaskPool) AddTask(t Task) {
 	index := atomic.AddUint32(&p.idx, 1)
 	p.AddShardTask(int(index), t)
 }
 
-// add sharding task
-func (p *TaskPool) AddShardTask(index int, t task) {
+// add sharding Task
+func (p *TaskPool) AddShardTask(index int, t Task) {
 	id := index % p.tQNumber
 
 	select {

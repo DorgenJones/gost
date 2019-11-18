@@ -13,7 +13,7 @@ type UnlimitedTaskPool struct {
 	TaskPoolOptions
 
 	idx    uint32 // round robin index
-	qArray []chan task
+	qArray []chan Task
 	wg     sync.WaitGroup
 
 	once sync.Once
