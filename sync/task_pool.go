@@ -133,6 +133,15 @@ func (p *TaskPool) stop() {
 	}
 }
 
+func (p *TaskPool) PendingSize() int {
+	var chanSize int
+	for _, qArray := range p.qArray {
+		chanSize += len(qArray)
+	}
+	return chanSize
+}
+
+
 // check whether the session has been closed.
 func (p *TaskPool) IsClosed() bool {
 	select {

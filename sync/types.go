@@ -68,4 +68,5 @@ type IShardingTaskPool interface {
 	AddShardTask(index int, t Task)
 	IsClosed()  bool
 	Close()
+	PendingSize() int
 }
