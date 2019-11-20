@@ -22,7 +22,23 @@ func TestBytesBufferPool(t *testing.T) {
 	//}
 }
 
+func TestIoBufferPoolWithCount(t *testing.T) {
+	buf := GetByteBuffer(0)
+	bytes := []byte{0x00, 0x01, 0x02, 0x03, 0x04}
+	buf.Write(bytes)
+	if buf.Len() != len(bytes) {
+		t.Error("iobuffer len not match write bytes' size")
+	}
+	PutByteBuffer(buf)
+	if buf.Len() != len(bytes) {
+		t.Error("iobuffer expected put ignore")
+	}
+	PutByteBuffer(buf)
+	if buf.Len() != 0 {
+		t.Error("iobuffer expected put success")
+	}
 
+}
 
 const Size = 2048
 
