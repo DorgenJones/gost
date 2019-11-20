@@ -19,6 +19,8 @@ type Buffer interface {
 
 	WriteTo(w io.Writer) (n int64, err error)
 
+	WriteString(s string) (n int, err error)
+
 	Bytes() []byte
 
 	ReadIndex(int)
