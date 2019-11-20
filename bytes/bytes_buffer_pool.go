@@ -31,11 +31,11 @@ func init() {
 	})
 }
 
-func GetByteBuffer(size int) *ByteBuffer {
-	return defaultPool.Get(size).(*ByteBuffer)
+func GetByteBuffer(size int) Buffer {
+	return defaultPool.Get(size).(Buffer)
 }
 
-func PutByteBuffer(buf *ByteBuffer) {
+func PutByteBuffer(buf Buffer) {
 	defaultPool.Put(buf)
 }
 
