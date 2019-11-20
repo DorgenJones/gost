@@ -18,7 +18,6 @@
 package gxbytes
 
 import (
-	"bytes"
 	"sync"
 )
 
@@ -28,23 +27,22 @@ var (
 
 func init() {
 	defaultPool = NewObjectPool(func() PoolObject {
-		return new(bytes.Buffer)
+		return new(ByteBuffer)
 	})
 }
 
-// GetBytesBuffer returns bytes.Buffer from pool
-func GetBytesBuffer() *bytes.Buffer {
-	return defaultPool.Get().(*bytes.Buffer)
+func GetByteBuffer(size int) *ByteBuffer {
+	return defaultPool.Get(size).(*ByteBuffer)
 }
 
-// PutIoBuffer returns IoBuffer to pool
-func PutBytesBuffer(buf *bytes.Buffer) {
+func PutByteBuffer(buf *ByteBuffer) {
 	defaultPool.Put(buf)
 }
 
 // Pool object
 type PoolObject interface {
-	Reset()
+	Free()
+	Init(param interface{})
 }
 
 type New func() PoolObject
@@ -60,17 +58,18 @@ func NewObjectPool(n New) *ObjectPool {
 }
 
 // take returns *bytes.Buffer from Pool
-func (p *ObjectPool) Get() PoolObject {
+func (p *ObjectPool) Get(param interface{}) PoolObject {
 	v := p.pool.Get()
 	if v == nil {
-		return p.New()
+		v = p.New()
 	}
-
-	return v.(PoolObject)
+	result := v.(PoolObject)
+	result.Init(param)
+	return result
 }
 
 // give returns *byes.Buffer to Pool
 func (p *ObjectPool) Put(o PoolObject) {
-	o.Reset()
+	o.Free()
 	p.pool.Put(o)
 }
