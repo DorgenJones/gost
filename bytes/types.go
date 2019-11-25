@@ -10,7 +10,6 @@ package gxbytes
 import "io"
 
 type Buffer interface {
-
 	Read(p []byte) (n int, err error)
 
 	ReadFrom(r io.Reader) (n int64, err error)
@@ -32,4 +31,6 @@ type Buffer interface {
 	Init(interface{})
 
 	Free()
+
+	Name() string
 }

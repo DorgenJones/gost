@@ -121,6 +121,10 @@ func (b *ByteBuffer) tryGrowByReslice(n int) (int, bool) {
 	return 0, false
 }
 
+func (b *ByteBuffer) Name() string {
+	return "ByteBuffer"
+}
+
 // grow grows the buffer to guarantee space for n more bytes.
 // It returns the index where bytes should be written.
 // If the buffer can't grow it will panic with ErrTooLarge.

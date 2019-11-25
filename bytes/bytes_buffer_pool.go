@@ -19,28 +19,39 @@ package gxbytes
 
 import (
 	"sync"
+	"sync/atomic"
 )
 
+const shardSize = 4
+
+var index uint64 = 1
+
 var (
-	defaultPool *ObjectPool
+	shardingBufferPool [shardSize]*ObjectPool
 )
 
 func init() {
-	defaultPool = NewObjectPool(func() PoolObject {
-		return new(ByteBuffer)
-	})
+	for i := 0; i < shardSize; i++ {
+		shardingBufferPool[i] = NewObjectPool(func() PoolObject {
+			return new(ByteBuffer)
+		})
+	}
+
 }
 
 func GetByteBuffer(size int) Buffer {
-	return defaultPool.Get(size).(Buffer)
+	i := atomic.AddUint64(&index, 1) % shardSize
+	return shardingBufferPool[i].Get(size).(Buffer)
 }
 
 func PutByteBuffer(buf Buffer) {
-	defaultPool.Put(buf)
+	i := atomic.AddUint64(&index, 1) % shardSize
+	shardingBufferPool[i].Put(buf)
 }
 
 // Pool object
 type PoolObject interface {
+	Name() string
 	Free()
 	Init(param interface{})
 }
