@@ -7,7 +7,9 @@
  */
 package gxbytes
 
-import "io"
+import (
+	"io"
+)
 
 type Buffer interface {
 	// Read reads the next len(p) bytes from the buffer or until the buffer
@@ -18,7 +20,7 @@ type Buffer interface {
 
 	// ReadFrom reads data from r until EOF and appends it to the buffer, growing
 	// the buffer as needed. The return value n is the number of bytes read. Any
-	// error except io.EOF encountered during the read is also returned. If the
+	// error encountered during the read is also returned. If the
 	// buffer becomes too large, ReadFrom will panic with ErrTooLarge.
 	ReadFrom(r io.Reader) (n int64, err error)
 
@@ -45,8 +47,8 @@ type Buffer interface {
 	// so immediate changes to the slice will affect the result of future reads.
 	Bytes() []byte
 
-	//set read index
-	ReadIndex(int)
+	//shift n byte
+	Shift(int)
 
 	// Len returns the number of bytes of the unread portion of the buffer;
 	// b.Len() == len(b.Bytes()).

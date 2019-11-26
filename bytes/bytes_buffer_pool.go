@@ -36,7 +36,6 @@ func init() {
 			return new(ByteBuffer)
 		})
 	}
-
 }
 
 func GetByteBuffer(size int) Buffer {
@@ -58,7 +57,7 @@ type PoolObject interface {
 
 type New func() PoolObject
 
-// Pool is bytes.Buffer Pool
+// Pool is bytes.buffer Pool
 type ObjectPool struct {
 	New  New
 	pool sync.Pool
@@ -68,7 +67,7 @@ func NewObjectPool(n New) *ObjectPool {
 	return &ObjectPool{New: n}
 }
 
-// take returns *bytes.Buffer from Pool
+// take returns *bytes.buffer from Pool
 func (p *ObjectPool) Get(param interface{}) PoolObject {
 	v := p.pool.Get()
 	if v == nil {
@@ -79,7 +78,7 @@ func (p *ObjectPool) Get(param interface{}) PoolObject {
 	return result
 }
 
-// give returns *byes.Buffer to Pool
+// give returns *byes.buffer to Pool
 func (p *ObjectPool) Put(o PoolObject) {
 	o.Free()
 	p.pool.Put(o)

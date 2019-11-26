@@ -1,4 +1,4 @@
-// Copy from types.Buffer (go@1.12.4) and change
+// Copy from types.buffer (go@1.12.4) and change
 // 1. clean useless code
 // 2. change the process of ReadFrom
 
@@ -36,7 +36,6 @@ func (b *ByteBuffer) Bytes() []byte { return b.buf[b.off:] }
 
 func (b *ByteBuffer) String() string {
 	if b == nil {
-		// Special case, useful in debugging.
 		return "<nil>"
 	}
 	return string(b.buf[b.off:])
@@ -71,6 +70,7 @@ func (b *ByteBuffer) Free() {
 	if b.copy != nil {
 		PutBytes(b.copy)
 	}
+	b.off = 0
 }
 
 func (b *ByteBuffer) tryGrowByReslice(n int) (int, bool) {
@@ -90,6 +90,13 @@ func (b *ByteBuffer) grow(n int) int {
 	// If buffer is empty, reset to recover space.
 	if m == 0 && b.off != 0 {
 		b.Reset()
+	}
+	// Try to translation
+	if free := cap(b.buf) - len(b.buf) + b.off; free > n {
+		newBuf := b.buf
+		copy(newBuf, b.buf[b.off:])
+		b.buf = newBuf[:len(b.buf)-b.off]
+		b.off = 0
 	}
 	// Try to grow by means of a reslice.
 	if i, ok := b.tryGrowByReslice(n); ok {
@@ -222,7 +229,7 @@ func (b *ByteBuffer) Read(p []byte) (n int, err error) {
 	return n, nil
 }
 
-func (b *ByteBuffer) ReadIndex(n int) {
+func (b *ByteBuffer) Shift(n int) {
 	if b.off+n > len(b.buf) {
 		return
 	}
@@ -238,19 +245,17 @@ func (b *ByteBuffer) Init(param interface{}) {
 		if size <= 0 {
 			size = MinRead
 		}
-		b.copy = makeSlice(size)
-		b.buf = *b.copy
+		b.buf = *makeSlice(size)
+		b.copy = &b.buf
+		b.buf = b.buf[:0]
+		b.off = 0
 	}
 }
 
 func NewByteBufferWithCapacity(capacity int) *ByteBuffer {
 	buffer := &ByteBuffer{
 	}
-	if capacity <= 0 {
-		capacity = DefaultSize
-	}
-	buffer.copy = GetBytes(capacity)
-	buffer.buf = *buffer.copy
+	buffer.Init(capacity)
 	return buffer
 }
 
@@ -258,6 +263,7 @@ func NewByteBufferString(s string) *ByteBuffer {
 	buf := []byte(s)
 	return &ByteBuffer{
 		buf:  buf,
+		off:  0,
 		copy: &buf,
 	}
 }
@@ -266,6 +272,7 @@ func NewByteBuffer(bytes []byte) *ByteBuffer {
 	return &ByteBuffer{
 		buf:  bytes,
 		copy: &bytes,
+		off:  0,
 	}
 }
 

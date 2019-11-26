@@ -1,6 +1,4 @@
-// Copyright 2009 The Go Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// Copy from types.buffer (go@1.12.4) and change
 
 package gxbytes
 
@@ -26,6 +24,16 @@ func init() {
 		testBytes[i] = 'a' + byte(i%26)
 	}
 	testString = string(testBytes)
+}
+
+const Size = 1024
+
+func sampleBytes() []byte {
+	buf := make([]byte, Size)
+	for i := 0; i < Size; i++ {
+		buf[i] = 1
+	}
+	return buf
 }
 
 // Verify that contents of buf match the string s.
@@ -209,6 +217,39 @@ func TestReadFrom(t *testing.T) {
 	}
 }
 
+func TestCopyByteBuffer(t *testing.T) {
+	testBytes := sampleBytes()
+	buffer := NewByteBufferWithCloneBytes(testBytes)
+	if !bytes.Equal(testBytes, buffer.Bytes()) {
+		t.Errorf("NewByteBufferWithCloneBytes is err")
+	}
+	testBytes[1] = byte(90)
+	if bytes.Equal(testBytes, buffer.Bytes()) {
+		t.Errorf("NewByteBufferWithCloneBytes clone is err")
+	}
+}
+
+func TestByteBuffer(t *testing.T) {
+	testBytes := sampleBytes()
+	buffer := NewByteBuffer(testBytes)
+	if !bytes.Equal(testBytes, buffer.Bytes()) {
+		t.Errorf("NewByteBufferWithCloneBytes is err")
+	}
+	testBytes[1] = byte(90)
+	if !bytes.Equal(testBytes, buffer.Bytes()) {
+		t.Errorf("NewByteBufferWithCloneBytes clone is err")
+	}
+}
+
+func TestStringByteBuffer(t *testing.T) {
+	testBytes := sampleBytes()
+	originalStr := string(testBytes)
+	strBuffer := NewByteBufferString(originalStr)
+	if originalStr != string(strBuffer.Bytes()) {
+		t.Errorf("NewByteBufferWithCloneBytes is err")
+	}
+}
+
 type panicReader struct{ panic bool }
 
 func (r panicReader) Read(p []byte) (int, error) {
@@ -225,7 +266,7 @@ func TestReadFromPanicReader(t *testing.T) {
 	// First verify non-panic behaviour
 	var buf ByteBuffer
 	i, err := buf.ReadFrom(panicReader{})
-	if err != nil {
+	if err != io.EOF {
 		t.Fatal(err)
 	}
 	if i != 0 {
@@ -364,7 +405,6 @@ func TestBufferGrowth(t *testing.T) {
 	}
 }
 
-// From Issue 5154.
 func BenchmarkBufferNotEmptyWriteRead(b *testing.B) {
 	buf := make([]byte, 1024)
 	for i := 0; i < b.N; i++ {
