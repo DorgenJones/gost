@@ -95,6 +95,7 @@ func (p *SlicePool) Get(size int) *[]byte {
 	isNew := false
 	var slotSize int
 	var actualSize int
+	var b *[]byte
 	defer func() {
 		if p := recover(); p != nil {
 			fmt.Printf("isNew:%s, need:%d, slotSize:%d, actualSize:%d, err:%+v, stack:%s", isNew, size, slotSize, actualSize, p, string(debug.Stack()))
@@ -109,11 +110,12 @@ func (p *SlicePool) Get(size int) *[]byte {
 	v := p.pool[slot].pool.Get()
 	if v == nil {
 		isNew = true
-		b := newSlice(p.pool[slot].defaultSize)
-		b = b[0:size]
-		return &b
+		n := newSlice(p.pool[slot].defaultSize)
+		b = &n
+		*b = (*b)[0:size]
+		return b
 	}
-	b := v.(*[]byte)
+	b = v.(*[]byte)
 	actualSize = len(*b)
 	*b = (*b)[0:size]
 	return b
