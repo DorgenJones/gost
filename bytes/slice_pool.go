@@ -19,6 +19,7 @@ package gxbytes
 
 import (
 	"fmt"
+	"runtime/debug"
 	"sync"
 )
 
@@ -95,7 +96,7 @@ func (p *SlicePool) Get(size int) *[]byte {
 	var len int
 	defer func() {
 		if p := recover(); p != nil {
-			fmt.Printf("isNew:%s, need:%d, actual:%d, err:%+v", isNew, size, len, p)
+			fmt.Printf("isNew:%s, need:%d, actual:%d, err:%+v, stack:%s", isNew, size, len, p, string(debug.Stack()))
 		}
 	}()
 	slot := p.slot(size)
