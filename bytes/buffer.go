@@ -16,6 +16,8 @@ type ByteBuffer struct {
 	copy     *[]byte
 }
 
+var nilByte []byte
+
 type readOp int8
 
 const (
@@ -70,6 +72,8 @@ func (b *ByteBuffer) Free() {
 	if b.copy != nil {
 		PutBytes(b.copy)
 	}
+	b.buf = nilByte
+	b.copy = nil
 	b.off = 0
 }
 
@@ -114,6 +118,7 @@ func (b *ByteBuffer) grow(n int) int {
 		// Not enough space anywhere, we need to allocate.
 		buf := *makeSlice(2*c + n)
 		copy(buf, b.buf[b.off:])
+		b.buf = b.buf[:0]
 		PutBytes(b.copy)
 		b.buf = buf
 		b.copy = &b.buf
@@ -266,11 +271,12 @@ func NewByteBufferString(s string) *ByteBuffer {
 }
 
 func NewByteBuffer(bytes []byte) *ByteBuffer {
-	return &ByteBuffer{
-		buf:  bytes,
-		copy: &bytes,
-		off:  0,
+	buffer := &ByteBuffer{
+		buf: bytes,
+		off: 0,
 	}
+	buffer.copy = &buffer.buf
+	return buffer
 }
 
 func NewByteBufferWithCloneBytes(bytes []byte) *ByteBuffer {

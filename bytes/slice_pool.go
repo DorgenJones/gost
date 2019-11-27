@@ -98,7 +98,7 @@ func (p *SlicePool) Get(size int) *[]byte {
 	var v interface{}
 	defer func() {
 		if p := recover(); p != nil {
-			fmt.Printf("isNew:%s, need:%d, slotSize:%d, actualSize:%d, data:%s, err:%+v, stack:%s", isNew, size, slotSize, actualSize, v, p, string(debug.Stack()))
+			fmt.Printf("isNew:%t, need:%d, slotSize:%d, actualSize:%d, data:%s, err:%+v, stack:%s", isNew, size, slotSize, actualSize, v, p, string(debug.Stack()))
 		}
 	}()
 	slot := p.slot(size)
