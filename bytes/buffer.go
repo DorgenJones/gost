@@ -6,6 +6,7 @@ package gxbytes
 
 import (
 	"errors"
+	"fmt"
 	"io"
 )
 
@@ -69,6 +70,9 @@ func (b *ByteBuffer) Reset() {
 
 func (b *ByteBuffer) Free() {
 	b.Reset()
+	if b.copy != &b.buf {
+		fmt.Println("copy & buf diff")
+	}
 	if b.copy != nil {
 		PutBytes(b.copy)
 	}
