@@ -18,6 +18,7 @@
 package gxbytes
 
 import (
+	"fmt"
 	"sync"
 )
 
@@ -90,13 +91,22 @@ func newSlice(size int) []byte {
 
 // Get returns *[]byte from SlicePool
 func (p *SlicePool) Get(size int) *[]byte {
+	isNew := false
+	var len int
+	defer func() {
+		if p :=recover(); p != nil {
+			fmt.Printf("isNew:%s, need:%d, actual:%d", isNew, size, len)
+		}
+	}()
 	slot := p.slot(size)
 	if slot == errSlot {
 		b := newSlice(size)
 		return &b
 	}
+	len = p.pool[slot].defaultSize
 	v := p.pool[slot].pool.Get()
 	if v == nil {
+		isNew = true
 		b := newSlice(p.pool[slot].defaultSize)
 		b = b[0:size]
 		return &b

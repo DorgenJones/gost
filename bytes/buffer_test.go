@@ -1,4 +1,4 @@
-// Copy from types.buffer (go@1.12.4) and change
+// based on types.buffer (go@1.11.2) extend
 
 package gxbytes
 
