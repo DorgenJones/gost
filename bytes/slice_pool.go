@@ -125,6 +125,10 @@ func (p *SlicePool) Put(buf *[]byte) {
 	if buf == nil {
 		return
 	}
+	len := len(*buf)
+	if len == 121 {
+		fmt.Println(len)
+	}
 	size := cap(*buf)
 	slot := p.slot(size)
 	if slot == errSlot {
