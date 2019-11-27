@@ -126,7 +126,7 @@ func (p *SlicePool) Put(buf *[]byte) {
 		return
 	}
 	len := len(*buf)
-	if len == 121 {
+	if len > 0 {
 		fmt.Println(len)
 	}
 	size := cap(*buf)
