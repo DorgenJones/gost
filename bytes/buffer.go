@@ -90,9 +90,8 @@ func (b *ByteBuffer) grow(n int) int {
 	// If buffer is empty, reset to recover space.
 	if m == 0 && b.off != 0 {
 		b.Reset()
-	}
-	// Try to translation
-	if free := cap(b.buf) - len(b.buf) + b.off; free > n {
+	} else if free := cap(b.buf) - len(b.buf) + b.off; free > n {
+		// Try to translation
 		newBuf := b.buf
 		copy(newBuf, b.buf[b.off:])
 		b.buf = newBuf[:len(b.buf)-b.off]
@@ -154,8 +153,6 @@ func (b *ByteBuffer) WriteString(s string) (n int, err error) {
 const MinRead = 1 << 9
 
 const MaxRead = MinRead << 8
-
-const DefaultSize = MinRead >> 2
 
 // change:
 //	1. maxRead limit

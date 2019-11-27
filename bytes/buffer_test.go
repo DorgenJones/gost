@@ -4,6 +4,7 @@ package gxbytes
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"math/rand"
 	"runtime"
@@ -214,6 +215,17 @@ func TestReadFrom(t *testing.T) {
 		var b ByteBuffer
 		b.ReadFrom(&buf)
 		empty(t, "TestReadFrom (2)", &b, s, make([]byte, len(testString)))
+	}
+}
+
+func TestReadFromLargeSize(t *testing.T) {
+	var buf ByteBuffer
+	var b ByteBuffer
+	for i := 0; i < 20; i += 1 {
+		buf.Write(testBytes)
+		n, err := b.ReadFrom(&buf)
+		fmt.Println(n, err, b.Len(), b.Cap())
+		b.Shift(rand.Intn(len(testBytes)))
 	}
 }
 
