@@ -94,8 +94,8 @@ func (p *SlicePool) Get(size int) *[]byte {
 	isNew := false
 	var len int
 	defer func() {
-		if p :=recover(); p != nil {
-			fmt.Printf("isNew:%s, need:%d, actual:%d", isNew, size, len)
+		if p := recover(); p != nil {
+			fmt.Printf("isNew:%s, need:%d, actual:%d, err:%+v", isNew, size, len, p)
 		}
 	}()
 	slot := p.slot(size)
