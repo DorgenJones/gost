@@ -18,8 +18,6 @@
 package gxbytes
 
 import (
-	"fmt"
-	"runtime/debug"
 	"sync"
 )
 
@@ -87,35 +85,23 @@ func (p *SlicePool) slot(size int) int {
 }
 
 func newSlice(size int) []byte {
-	return make([]byte, size)
+	return make([]byte, 0, size)
 }
 
 // Get returns *[]byte from SlicePool
 func (p *SlicePool) Get(size int) *[]byte {
-	isNew := false
-	var slotSize int
-	var actualSize int
-	var v interface{}
-	defer func() {
-		if p := recover(); p != nil {
-			fmt.Printf("isNew:%t, need:%d, slotSize:%d, actualSize:%d, data:%s, err:%+v, stack:%s", isNew, size, slotSize, actualSize, v, p, string(debug.Stack()))
-		}
-	}()
 	slot := p.slot(size)
 	if slot == errSlot {
 		b := newSlice(size)
 		return &b
 	}
-	slotSize = p.pool[slot].defaultSize
-	v = p.pool[slot].pool.Get()
+	v := p.pool[slot].pool.Get()
 	if v == nil {
-		isNew = true
 		b := newSlice(p.pool[slot].defaultSize)
 		b = b[0:size]
 		return &b
 	}
 	b := v.(*[]byte)
-	actualSize = len(*b)
 	*b = (*b)[0:size]
 	return b
 }
@@ -124,10 +110,6 @@ func (p *SlicePool) Get(size int) *[]byte {
 func (p *SlicePool) Put(buf *[]byte) {
 	if buf == nil {
 		return
-	}
-	len := len(*buf)
-	if len > 0 {
-		fmt.Println(len)
 	}
 	size := cap(*buf)
 	slot := p.slot(size)

@@ -6,7 +6,6 @@ package gxbytes
 
 import (
 	"errors"
-	"fmt"
 	"io"
 )
 
@@ -70,15 +69,11 @@ func (b *ByteBuffer) Reset() {
 
 func (b *ByteBuffer) Free() {
 	b.Reset()
-	if b.copy != &b.buf {
-		fmt.Println("copy & buf diff")
-	}
 	if b.copy != nil {
 		PutBytes(b.copy)
 	}
 	b.buf = nilByte
 	b.copy = nil
-	b.off = 0
 }
 
 func (b *ByteBuffer) tryGrowByReslice(n int) (int, bool) {
@@ -120,12 +115,11 @@ func (b *ByteBuffer) grow(n int) int {
 		panic(ErrTooLarge)
 	} else {
 		// Not enough space anywhere, we need to allocate.
-		buf := *makeSlice(2*c + n)
-		copy(buf, b.buf[b.off:])
-		b.buf = b.buf[:0]
+		tmp := *makeSlice(2*c + n)
+		copy(tmp, b.buf[b.off:])
 		PutBytes(b.copy)
-		b.buf = buf
-		b.copy = &b.buf
+		b.buf = tmp
+		b.copy = &tmp
 	}
 	// Restore b.off and len(b.buf).
 	b.off = 0
@@ -251,9 +245,8 @@ func (b *ByteBuffer) Init(param interface{}) {
 		if size <= 0 {
 			size = MinRead
 		}
-		b.buf = *makeSlice(size)
-		b.copy = &b.buf
-		b.buf = b.buf[:0]
+		b.copy = makeSlice(size)
+		b.buf = (*b.copy)[:0]
 		b.off = 0
 	}
 }
@@ -279,7 +272,7 @@ func NewByteBuffer(bytes []byte) *ByteBuffer {
 		buf: bytes,
 		off: 0,
 	}
-	buffer.copy = &buffer.buf
+	buffer.copy = &bytes
 	return buffer
 }
 
