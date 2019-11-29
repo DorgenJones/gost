@@ -18,6 +18,13 @@ type Buffer interface {
 	// otherwise it is nil.
 	Read(p []byte) (n int, err error)
 
+	// Grow grows the buffer's capacity, if necessary, to guarantee space for
+	// another n bytes. After Grow(n), at least n bytes can be written to the
+	// buffer without another allocation.
+	// If n is negative, Grow will panic.
+	// If the buffer can't grow it will panic with ErrTooLarge.
+	Grow(n int)
+
 	// ReadFrom reads data from r until EOF and appends it to the buffer, growing
 	// the buffer as needed. The return value n is the number of bytes read. Any
 	// error encountered during the read is also returned. If the
