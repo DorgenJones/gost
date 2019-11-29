@@ -93,6 +93,7 @@ func (b *ByteBuffer) grow(n int) int {
 	// If buffer is empty, reset to recover space.
 	if m == 0 && b.off != 0 {
 		b.Reset()
+	} else if cap(b.buf)-len(b.buf) > n {
 	} else if free := cap(b.buf) - len(b.buf) + b.off; free > n {
 		// Try to translation
 		newBuf := b.buf
