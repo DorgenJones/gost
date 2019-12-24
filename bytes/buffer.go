@@ -1,6 +1,7 @@
-// Copy from types.buffer (go@1.11.2) and change
+// Copy from bytes.buffer (go@1.11.2) and change
 // 1. clean useless code
 // 2. change the process of ReadFrom
+// 3. change the grow
 
 package gxbytes
 

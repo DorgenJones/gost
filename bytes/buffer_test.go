@@ -1,4 +1,4 @@
-// based on types.buffer (go@1.11.2) extend
+// based on bytes.buffer (go@1.11.2) extend
 
 package gxbytes
 
